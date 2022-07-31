@@ -1,0 +1,57 @@
+
+
+Agent Environment
+    Obsvars:
+    	x1 : boolean;
+    end Obsvars
+    Actions = {none};
+    Protocol:
+	Other : {none};
+    end Protocol
+    Evolution:
+    	x1 = true  		    if (x1 = false);
+    end Evolution
+end Agent
+
+
+Agent player
+
+    Vars:
+	x2 : boolean;
+    end Vars
+
+    Actions = {a,b};
+
+    Protocol:
+       (Environment.x1=true or x2=true):{a};
+	Other : {a,b};  
+    end Protocol
+
+    Evolution:
+	x2 = true if ((Action=a and Environment.x1=true and x2=false) or (Action=a and Environment.x1=false and x2=false)); 
+	end Evolution
+
+end Agent
+
+Evaluation
+		p1 if (Environment.x1=true);
+	    	p2 if (player.x2=true);
+end Evaluation
+
+InitStates
+	Environment.x1=false and player.x2=false;
+	
+end InitStates
+
+Groups
+	g1 = {player};
+end Groups
+
+Fairness
+end Fairness
+
+Formulae
+	<g1>F(p1 and p2);	
+	
+	
+end Formulae

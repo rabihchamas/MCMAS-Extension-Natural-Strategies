@@ -1,0 +1,486 @@
+int
+cmplxCube(BDD cube,bdd_parameters *para)
+{    int c=0;
+     int n=0;
+     int m=0;
+     vector<BDD> * w = para->v;
+     BDD temp1;
+     BDD temp2;
+    for(unsigned int j = 0; j < w->size(); j++){
+        temp1 = !(*w)[j] * cube;
+        temp2 = (*w)[j] * cube;
+    if(temp1 == para->bddmgr->bddZero()){
+         cout<<"x"<<j+1;
+         c++;
+        }else if( temp2 == para->bddmgr->bddZero()){
+        cout<<"!x"<<j+1;
+         c++;
+         n++;
+        }
+    }
+    m = c-1;
+   // cout<<" the complexity of the cube is "<< c+m+n<<endl;
+    return c + m + n;
+}
+
+vector<BDD>
+vectCubes(BDD form,bdd_parameters *para )
+{
+     BDD sum = para->bddmgr->bddZero();
+     std::vector<BDD> myvector{};
+     std::vector<BDD> Bvect;
+     std::vector<BDD> Bvectmp;
+     vector<BDD> * w = para->v;
+     int e = 0;
+      for (unsigned int j = 0; j < w->size(); j++) {
+           if(form.ExistAbstract((*w)[j]) != form ){
+           Bvect.push_back((*w)[j]);
+           Bvect.push_back(!(*w)[j]);
+           }
+           }
+      for (unsigned int i = 0; i < Bvect.size(); i++){
+           if(Bvect[i] * !form == para->bddmgr->bddZero()){
+                myvector.push_back(Bvect[i]);
+                sum = sum + Bvect[i];
+                Bvect[i] = para->bddmgr->bddZero();
+              //  cout<< "push_back one cube"<<endl;
+           }
+           }
+      while(sum != form){
+          //   cout<<"Enter the while loop"<<endl;
+            for (unsigned int i = 0; i < Bvect.size(); i++){
+                for (unsigned int j = 0; j < w->size(); j++){
+                   Bvectmp.push_back(Bvect[i]*(*w)[j]);
+                   Bvectmp.push_back(Bvect[i]*!(*w)[j]);
+                  // cout<<"first loop after while"<<endl;
+                }
+               }
+              Bvect = Bvectmp;
+              Bvectmp.clear();
+            for (unsigned int i = 0; i < Bvect.size(); i++){
+                //cout<<"second loop after the while "<<endl;
+                e=0;
+               if((Bvect[i] != para->bddmgr->bddZero()) and (Bvect[i] * !form == para->bddmgr->bddZero())){
+                   if (myvector.size() != 0) {
+                    for (unsigned int j = 0; j < myvector.size(); j++){
+                        if(Bvect[i] * !myvector[j] == para->bddmgr->bddZero()){
+                            e = 1;
+                            break;
+                        }
+                        }
+                        }
+                      if (e==0){
+                        myvector.push_back(Bvect[i]);
+                        sum = sum + Bvect[i];
+                        //cout<< "push_back one cube"<<endl;
+                        Bvect[i] = para->bddmgr->bddZero();
+                        }
+                     if (sum == form){break;}
+
+                    }
+           }
+       }
+      // cout<<"finish the first while"<<endl;
+       return myvector;
+}
+/*
+vector<BDD>
+vectCubesProp(BDD form, vector<BDD> *w, bdd_parameters *para)
+{    BDD in_st = *(para->in_st);
+     BDD sum = para->bddmgr->bddZero();
+     std::vector<BDD> myvector{};
+     std::vector<BDD> Bvect;
+     std::vector<BDD> Bvectmp;
+     int count = 0;
+     int e = 0;
+      for (unsigned int j = 0; j < w->size(); j++) {
+           Bvect.push_back((*w)[j]);
+           Bvect.push_back(!(*w)[j]);
+           }
+      for (unsigned int i = 0; i < Bvect.size(); i++){
+           if(Bvect[i] * !form == para->bddmgr->bddZero()){
+                myvector.push_back(Bvect[i]);
+                sum = sum + Bvect[i];
+                Bvect[i] = para->bddmgr->bddZero();
+              //  cout<< "push_back one cube"<<endl;
+           }
+           }
+      while(( sum  != form) and count != w->size() ){
+            count++;
+            for (unsigned int i = 0; i < Bvect.size(); i++){
+
+                for (unsigned int j = 0; j < w->size(); j++){
+                   Bvectmp.push_back(Bvect[i]*(*w)[j]);
+                   Bvectmp.push_back(Bvect[i]*!(*w)[j]);
+                }
+               }
+              Bvect = Bvectmp;
+              Bvectmp.clear();
+            for (unsigned int i = 0; i < Bvect.size(); i++){
+                e=0;
+               if((Bvect[i] != para->bddmgr->bddZero()) and (Bvect[i] * !form == para->bddmgr->bddZero())){
+                   if (myvector.size() != 0) {
+                    for (unsigned int j = 0; j < myvector.size(); j++){
+                        if(Bvect[i] * !myvector[j] == para->bddmgr->bddZero()){
+                            e = 1;
+                            break;
+                        }
+                        }
+                        }
+                      if (e==0){
+                        myvector.push_back(Bvect[i]);
+                        sum = sum + Bvect[i];
+                        Bvect[i] = para->bddmgr->bddZero();
+                        }
+                     if (sum  == form ){break;}
+
+                    }
+           }
+       }
+      // cout<<"finish the first while"<<endl;
+      if (count == w->size()){ myvector.clear();}
+
+       return myvector;
+     }
+/*
+vector<BDD>
+vectCubesProp(BDD form, vector<BDD> *w, bdd_parameters *para)
+{    BDD in_st = *(para->in_st);
+     BDD sum = para->bddmgr->bddZero();
+     std::vector<BDD> myvector{};
+     std::vector<BDD> Bvect;
+     std::vector<BDD> Bvectmp;
+     int count = 0;
+     int e = 0;
+      for (unsigned int j = 0; j < w->size(); j++) {
+           Bvect.push_back((*w)[j]);
+           Bvect.push_back(!(*w)[j]);
+           }
+      for (unsigned int i = 0; i < Bvect.size(); i++){
+           if(Bvect[i] * !form == para->bddmgr->bddZero()){
+                myvector.push_back(Bvect[i]);
+                sum = sum + Bvect[i];
+                Bvect[i] = para->bddmgr->bddZero();
+              //  cout<< "push_back one cube"<<endl;
+           }
+           }
+      while(( sum  != form) and count != w->size() ){
+            count++;
+            for (unsigned int i = 0; i < Bvect.size(); i++){
+
+                for (unsigned int j = 0; j < w->size(); j++){
+                   Bvectmp.push_back(Bvect[i]*(*w)[j]);
+                   Bvectmp.push_back(Bvect[i]*!(*w)[j]);
+                }
+               }
+              Bvect = Bvectmp;
+              Bvectmp.clear();
+            for (unsigned int i = 0; i < Bvect.size(); i++){
+                e=0;
+               if((Bvect[i] != para->bddmgr->bddZero()) and (Bvect[i] * !form == para->bddmgr->bddZero())){
+                   if (myvector.size() != 0) {
+                    for (unsigned int j = 0; j < myvector.size(); j++){
+                        if(Bvect[i] * !myvector[j] == para->bddmgr->bddZero()){
+                            e = 1;
+                            break;
+                        }
+                        }
+                        }
+                      if (e==0){
+                        myvector.push_back(Bvect[i]);
+                        sum = sum + Bvect[i];
+                        Bvect[i] = para->bddmgr->bddZero();
+                        }
+                     if (sum  == form ){break;}
+
+                    }
+           }
+       }
+      // cout<<"finish the first while"<<endl;
+      if (count == w->size()){ myvector.clear();}
+
+       return myvector;
+     }
+/*
+vector<BDD>
+vectCubesProp(BDD form, vector<BDD> *w, bdd_parameters *para)
+{    BDD in_st = *(para->in_st);
+     BDD sum = para->bddmgr->bddZero();
+     std::vector<BDD> myvector{};
+     std::vector<BDD> Bvect;
+     std::vector<BDD> Bvectmp;
+     int count = 0;
+     int e = 0;
+      for (unsigned int j = 0; j < w->size(); j++) {
+           Bvect.push_back((*w)[j]);
+           Bvect.push_back(!(*w)[j]);
+           }
+      for (unsigned int i = 0; i < Bvect.size(); i++){
+           if(Bvect[i] * !form == para->bddmgr->bddZero()){
+                myvector.push_back(Bvect[i]);
+                sum = sum + Bvect[i];
+                Bvect[i] = para->bddmgr->bddZero();
+              //  cout<< "push_back one cube"<<endl;
+           }
+           }
+      while(( sum  != form) and count != w->size() ){
+            count++;
+            for (unsigned int i = 0; i < Bvect.size(); i++){
+
+                for (unsigned int j = 0; j < w->size(); j++){
+                   Bvectmp.push_back(Bvect[i]*(*w)[j]);
+                   Bvectmp.push_back(Bvect[i]*!(*w)[j]);
+                }
+               }
+              Bvect = Bvectmp;
+              Bvectmp.clear();
+            for (unsigned int i = 0; i < Bvect.size(); i++){
+                e=0;
+               if((Bvect[i] != para->bddmgr->bddZero()) and (Bvect[i] * !form == para->bddmgr->bddZero())){
+                   if (myvector.size() != 0) {
+                    for (unsigned int j = 0; j < myvector.size(); j++){
+                        if(Bvect[i] * !myvector[j] == para->bddmgr->bddZero()){
+                            e = 1;
+                            break;
+                        }
+                        }
+                        }
+                      if (e==0){
+                        myvector.push_back(Bvect[i]);
+                        sum = sum + Bvect[i];
+                        Bvect[i] = para->bddmgr->bddZero();
+                        }
+                     if (sum  == form ){break;}
+
+                    }
+           }
+       }
+      // cout<<"finish the first while"<<endl;
+      if (count == w->size()){ myvector.clear();}
+
+       return myvector;
+     }
+*/
+/*
+vector<BDD>
+vectCubesProp(BDD form, vector<BDD> *w, bdd_parameters *para)
+{    BDD in_st = *(para->in_st);
+     BDD sum = para->bddmgr->bddZero();
+     std::vector<BDD> myvector{};
+     std::vector<BDD> Bvect;
+     std::vector<BDD> Bvectmp;
+     int count = 0;
+     int e = 0;
+      for (unsigned int j = 0; j < w->size(); j++) {
+           Bvect.push_back((*w)[j]);
+           Bvect.push_back(!(*w)[j]);
+           }
+      for (unsigned int i = 0; i < Bvect.size(); i++){
+           if(Bvect[i] * !form == para->bddmgr->bddZero()){
+                myvector.push_back(Bvect[i]);
+                sum = sum + Bvect[i];
+                Bvect[i] = para->bddmgr->bddZero();
+              //  cout<< "push_back one cube"<<endl;
+           }
+           }
+      while(( sum  != form) and count != w->size() ){
+            count++;
+            for (unsigned int i = 0; i < Bvect.size(); i++){
+
+                for (unsigned int j = 0; j < w->size(); j++){
+                   Bvectmp.push_back(Bvect[i]*(*w)[j]);
+                   Bvectmp.push_back(Bvect[i]*!(*w)[j]);
+                }
+               }
+              Bvect = Bvectmp;
+              Bvectmp.clear();
+            for (unsigned int i = 0; i < Bvect.size(); i++){
+                e=0;
+               if((Bvect[i] != para->bddmgr->bddZero()) and (Bvect[i] * !form == para->bddmgr->bddZero())){
+                   if (myvector.size() != 0) {
+                    for (unsigned int j = 0; j < myvector.size(); j++){
+                        if(Bvect[i] * !myvector[j] == para->bddmgr->bddZero()){
+                            e = 1;
+                            break;
+                        }
+                        }
+                        }
+                      if (e==0){
+                        myvector.push_back(Bvect[i]);
+                        sum = sum + Bvect[i];
+                        Bvect[i] = para->bddmgr->bddZero();
+                        }
+                     if (sum  == form ){break;}
+
+                    }
+           }
+       }
+      // cout<<"finish the first while"<<endl;
+      if (count == w->size()){ myvector.clear();}
+
+       return myvector;
+     }
+*/
+
+/*
+vector<BDD>
+vectCubesProp(BDD form, vector<BDD> *w, bdd_parameters *para)
+{
+  BDD sum = para->bddmgr->bddZero();
+     std::vector<BDD> myvector = {para->bddmgr->bddZero()};
+     std::vector<BDD> Bvect;
+     std::vector<BDD> Cvect = {para->bddmgr->bddOne()};
+     int e = 0;
+    for (unsigned int i = 0; i < (w->size()+1)/2; i++){
+
+       for (unsigned int j = 0; j < Cvect.size(); j++){
+          for (unsigned int k = 0; k < w->size(); k++){
+                if((Cvect[j]*(*w)[k]) * !form == para->bddmgr->bddZero()){
+                    e = 0;
+                   for (unsigned int l = 0; l < myvector.size(); l++){
+                        if((Cvect[j]*(*w)[k]) * !myvector[l] == para->bddmgr->bddZero()){
+                            e = 1;
+                            break;
+                    }
+                    }
+                    if( e == 0 )
+                    {
+                        myvector.push_back(Cvect[j]*(*w)[k]);
+                        sum = sum + (Cvect[j]*(*w)[k]);
+                        if(sum == form)
+                         return myvector;
+                     }
+                }
+                else if((Cvect[j]*!(*w)[k]) * !form == para->bddmgr->bddZero()){
+                    e = 0;
+                   for (unsigned int l = 0; l < myvector.size(); l++){
+                        if((Cvect[j]*!(*w)[k]) * !myvector[l] == para->bddmgr->bddZero())
+                            break;
+                            e = 1;
+                    }
+                    if( e == 0){
+                        myvector.push_back(Cvect[j]*!(*w)[k]);
+                        sum = sum + (Cvect[j]*!(*w)[k]);
+                        if(sum == form)
+                         return myvector;
+                }
+                }
+                else
+                { if((Cvect[j]*!(*w)[k]) != para->bddmgr->bddZero())
+                        Bvect.push_back(Cvect[j]*!(*w)[k]);
+                 if(Cvect[j]*(*w)[k] != para->bddmgr->bddZero())
+                        Bvect.push_back(Cvect[j]*(*w)[k]);
+                 }
+           }
+        }
+        Cvect.clear();
+       for (unsigned int j = 0; j < Bvect.size(); j++){
+          for (unsigned int k = 0; k < w->size(); k++){
+                if((Bvect[j]*(*w)[k]) * !form == para->bddmgr->bddZero()){
+                    e = 0;
+                   for (unsigned int l = 0; l < myvector.size(); l++){
+                        if((Bvect[j]*(*w)[k]) * !myvector[l] == para->bddmgr->bddZero()){
+                            break;
+                            e = 1;
+                    }
+                    }
+                    if( e == 0 ){
+                        myvector.push_back(Bvect[j]*(*w)[k]);
+                        sum = sum + (Bvect[j]*(*w)[k]);
+                        if(sum == form)
+                         return myvector;
+                }
+                }
+                else if(((Bvect[j]*!(*w)[k])) * !form == para->bddmgr->bddZero()){
+                   for (unsigned int l = 0; l < myvector.size(); l++){
+                        e = 0;
+                        if((Bvect[j]*!(*w)[k]) * !myvector[l] == para->bddmgr->bddZero()){
+                            e = 1;
+                            break;
+                    }
+                    }
+                    if( e == 0){
+                        myvector.push_back(Bvect[j]*!(*w)[k]);
+                        sum = sum + (Bvect[j]*!(*w)[k]);
+                        if(sum == form)
+                         return myvector;
+                }
+                }
+                else
+                { if(Bvect[j]*!(*w)[k] != para->bddmgr->bddZero())
+                        Cvect.push_back(Bvect[j]*!(*w)[k]);
+                 if(Bvect[j]*(*w)[k] != para->bddmgr->bddZero())
+                        Cvect.push_back(Bvect[j]*(*w)[k]);
+                 }
+           }
+        }
+        Bvect.clear();
+
+    }
+    myvector.clear();
+    return myvector;
+}
+
+*/
+int cmplxform(BDD form,bdd_parameters *para)
+{
+  vector<BDD> myvector = vectCubes(form,para);
+  cout<< " we have "<< myvector.size()<< " cubes "<<endl;
+  vector<BDD> * w = para->v;
+  int s = myvector.size()-1;
+  int c = 0;
+  int a = 0;
+  for (unsigned int j = 0; j < myvector.size(); j++) {
+        s = s + cmplxCube(myvector[j],para);
+       if(j<myvector.size()-1) cout<<"+";
+     }
+  // removing the counting of repeated variables
+  for (unsigned int i = 0; i < w->size(); i++){
+    for (unsigned int j = 0; j < myvector.size(); j++){
+    //myvector[j].ExistAbstract((*w)[i]) != myvector[j]
+      if (((myvector[j]*(*w)[i]) == para->bddmgr->bddZero()) or ( myvector[j]*!(*w)[i] == para->bddmgr->bddZero())){
+      // cout<<" the "<< j << "th cube is restricted by the "<< i<<"th variable"<< endl;
+         c++;
+     }
+    }
+    if(c>1) {
+    a = a + c-1;}
+    c = 0;
+    }
+    s = s-a;
+    return s;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

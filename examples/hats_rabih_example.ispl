@@ -1,0 +1,117 @@
+-- The Three hat puzzle
+
+Agent Environment
+
+
+  Vars:
+	
+	state: 1..4;
+    	1sayknow: boolean;
+	2sayknow: boolean;
+	3sayknow: boolean;
+  	hat1: {black,white};
+  	hat2: {black,white};
+  	hat3: {black,white};
+  end Vars
+
+  Actions = { ask1,ask2,ask3,none };
+  Protocol:
+     	state=1: {ask1};
+    	state=2: {ask2};
+	state=3: {ask3};
+	Other  : {none};
+  end Protocol
+
+  Evolution:
+    	state=2 if state=1;
+    	state=3 if state=2;
+	state=4 if state=3;
+	1sayknow =True if Person1.Actions=sayknow;
+	2sayknow =True if Person2.Actions=sayknow;
+	3sayknow =True if Person3.Actions=sayknow;
+	1sayknow =False if Person1.Actions=saydonotknow;
+	2sayknow =False if Person2.Actions=saydonotknow;
+	3sayknow =False if Person3.Actions=saydonotknow;
+  end Evolution
+end Agent
+
+Agent Person1
+  Lobsvars = {hat2, hat3};
+  Vars:
+  end Vars
+  Actions = { saydonotknow, sayknow};
+  Protocol:
+	Environment.Actions=ask1 and hat2=black and hat3=black : {sayknow}; 
+	Environment.Actions=ask1 and !(hat2=black and hat3=black):{saydonotknow};
+  end Protocol
+  Evolution:
+	
+end Evolution
+
+end Agent
+
+Agent Person2
+  Lobsvars = {hat3};
+  Vars:
+  end Vars
+Actions = { saydonotknow, sayknow};
+  Protocol:
+	Environment.Actions=ask2 and Person1.Actions=sayknow and hat3 = black : {sayknow}; 
+	Environment.Actions=ask2 and !(Person1.Actions=sayknow and hat3 = black):{saydonotknow};
+  end Protocol
+  Evolution:
+  end Evolution
+end Agent
+
+Agent Person3
+  Vars:
+  end Vars
+  Actions = { saydonotknow, sayknow };
+  Protocol:
+	--Environment.Actions=ask3 and Person1.Actions=saydonotknow and Person2.Actions=saydonotknow   : {sayknow}; 
+	--Actions.Environment=ask3 and !():{saydonotknow};
+
+  end Protocol
+  Evolution:
+    
+  end Evolution
+end Agent
+
+Evaluation
+	Hat1IsBlack if Environment.hat1=black;
+	Hat2IsBlack if Environment.hat2=black;
+	Hat3IsBlack if Environment.hat3=black;
+	Hat1IsWhite if Environment.hat1=white;
+	Hat2IsWhite if Environment.hat2=white;
+	Hat3IsWhite if Environment.hat3=white;
+	p1dntkiscmnkn if Environment.1sayknow =False;
+	p2dntkiscmnkn if Environment.2sayknow =False;
+	p3dntkiscmnkn if Environment.3sayknow =False;
+	p1kiscmnkn if Environment.1sayknow =True;
+	p2kiscmnkn if Environment.2sayknow =True;
+	p3kiscmnkn if Environment.3sayknow =True;
+
+end Evaluation
+
+InitStates
+Environment.state=1 and ((Environment.hat1=black and Environment.hat2=black and Environment.hat3=white)or
+			 (Environment.hat1=black and Environment.hat2=white and Environment.hat3=white)or
+			(Environment.hat1=white and Environment.hat2=black and Environment.hat3=white)or
+			(Environment.hat1=white and Environment.hat2=white and Environment.hat3=white)or
+			(Environment.hat1=white and Environment.hat2=white and Environment.hat3=black)or
+			(Environment.hat1=white and Environment.hat2=black and Environment.hat3=black)or
+			(Environment.hat1=black and Environment.hat2=white and Environment.hat3=black));
+end InitStates
+Groups
+  g1 = {Person1,Person2,Person3};
+end Groups
+
+Fairness
+  	!(Hat1IsBlack and Hat2IsBlack and Hat3IsBlack);
+	p1dntkiscmnkn -> AG(GCK(g1,!(Hat2IsBlack and Hat3IsBlack)));
+	p2dntkiscmnkn -> AG(GCK(g1,!(Hat3IsBlack)));
+
+end Fairness
+Formulae
+--EF(k(Person3,Hat3IsBlack) or k(Person3,Hat3IsWhite) );
+end Formulae

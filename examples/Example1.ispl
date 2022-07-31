@@ -1,0 +1,65 @@
+
+
+Agent Environment
+    Obsvars:
+    	x1 : boolean;
+    	x2 : boolean;
+	x3 : boolean;
+    end Obsvars
+    Actions = {none};
+    Protocol:
+	Other : {none};
+    end Protocol
+    Evolution:
+    	x2 = false  		    if ((player.Action=a and x2=true and x3=true)or(player.Action=b and x2=true and x1=true and x3=false));
+    	x1 = false  		    if ((player.Action=b and ((x1=true and x3=true) or (x1=true and x2=false and x3=false)))or(player.Action=a and x1=true and x2=true and x3=false));
+	x2 = true   		    if (player.Action=a and ((x2=false and x1=true and x3=true) or (x2=false and x1=false and x3=false)));
+       (x1 = true and x3 = false )  if (player.Action=b and x1=false and x3=true);
+    end Evolution
+end Agent
+
+
+Agent player
+
+    Vars:
+	x4 : boolean;
+    end Vars
+
+    Actions = {a,b};
+
+    Protocol:
+       (x4=false and Environment.x2=true and Environment.x3=true):{b};
+       (x4=false and Environment.x2=false and Environment.x3=false and Environment.x1=true):{b};
+	Other : {a,b};  
+    end Protocol
+
+    Evolution:
+	x4 = false if (Action=a and x4=true and Environment.x2=false and ((Environment.x1=true and Environment.x3=true)or(Environment.x1=false and Environment.x3=false))); 
+	end Evolution
+
+end Agent
+
+Evaluation
+		p1 if (Environment.x2=true);
+	    	p2 if (player.x4=true);
+		p3 if (Environment.x1=true);
+		p4 if (Environment.x3=true);
+end Evaluation
+
+InitStates
+	Environment.x1=true and Environment.x2=true and Environment.x3=true and player.x4=true;
+	
+end InitStates
+
+Groups
+	g1 = {player};
+end Groups
+
+Fairness
+end Fairness
+
+Formulae
+	<g1>F(!p1 and !p2);	
+	
+	
+end Formulae

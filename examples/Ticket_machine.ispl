@@ -1,0 +1,85 @@
+
+--<g1>F(ticket)
+
+Agent Environment
+    Obsvars:
+    	q1 : boolean;
+    	q2 : boolean;
+	selected : boolean;
+	paid : boolean;
+	error : boolean;
+    end Obsvars
+    Actions = {i,h,print,reset};
+    Protocol:
+    	(error=true):{reset};
+	(paid=true):{print};
+	Other : {i,h};
+    end Protocol
+    Evolution:
+    	q1=true  if ((customer.Action=select and Action=h and q1=false and q2=false) or
+(customer.Action=select and Action=i and q1=false and q2=true));
+    	q2=true  if (customer.Action=select and Action=i and q2=false);
+	selected=true if (((q1=true or q2=true) and Action=h and customer.Action=select) or
+(q1=true and q2=true and Action=i and customer.Action=select));
+	paid=true if ((selected = true and customer.Action=pay and Action=h)or
+(selected = true and customer.Action=pay and Action=i and q1=true and q2=true));
+	q2=false if (Action=i and customer.Action=pay and q1=false and q2=true and selected=true);
+	q1=true and q2=true if (Action=i and customer.Action=pay and q1=false and q2=false and selected=true);
+	q2=true if (Action=i and customer.Action=pay and q1=true and q2=false and selected=true);
+	--q1=false and q2=false and paid=false and selected=false if (customer.Action=finish);
+    end Evolution
+end Agent
+
+Agent customer
+
+    Vars:
+	ticket : boolean;
+    end Vars
+
+    Actions = {none,select,pay};
+
+    Protocol:
+    	(Environment.selected=true) : {pay,none};
+	(Environment.paid=true) : {none};
+	(ticket=true) : {none};
+	Other : {none,select};  
+    end Protocol
+
+    Evolution:
+	ticket=true if (Environment.paid=true);
+	--ticket=false if (Action=finish); 
+	end Evolution
+
+end Agent
+
+Evaluation
+		paid if (Environment.paid=true);
+	    	ticket if (customer.ticket=true);
+		selected if (Environment.selected=true);
+		error if (Environment.error=true);
+end Evaluation
+
+InitStates
+	Environment.selected=false and customer.ticket=false and Environment.q1=false
+and Environment.q2=false and Environment.paid=false and Environment.error=false;
+	
+end InitStates
+
+Groups
+	g1 = {customer};
+end Groups
+
+Fairness
+end Fairness
+
+Formulae
+	--paid;
+	--ticket;
+	--selected;
+	--error;
+	--(paid and ticket) or (selected and error);
+	--notselected;
+	<g1>F(ticket);	
+	
+
+end Formulae

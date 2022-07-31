@@ -1,0 +1,166 @@
+-- Tictactoe natural strategy
+
+
+Agent Enviroment
+  Vars:
+  state :{playing,gameover}
+  end Vars
+  Actions = {finish};
+  Protocol:
+	  ( (P(0,0)=X and P(0,1)=X and P(0,2)=X) or (P(1,0)=X and P(1,1)=X and P(1,2)=X)
+		or (P(2,0)=X and P(2,1)=X and P(2,2)=X) or (P(0,0)=X and P(1,0)=X and P(2,0)=X)
+		or (P(0,1)=X and P(1,1)=X and P(2,1)=X) or (P(0,2)=X and P(1,2)=X and P(2,2)=X)
+		or (P(0,0)=X and P(1,1)=X and P(2,2)=X) or (P(2,0)=X and P(1,1)=X and P(0,2)=X) or
+  		 (P(0,0)=O and P(0,1)=O and P(0,2)=O) or (P(1,0)=O and P(1,1)=O and P(1,2)=O)
+		or (P(2,0)=O and P(2,1)=O and P(2,2)=O) or (P(0,0)=O and P(1,0)=O and P(2,0)=O)
+		or (P(0,1)=O and P(1,1)=O and P(2,1)=O) or (P(0,2)=O and P(1,2)=O and P(2,2)=O)
+		or (P(0,0)=O and P(1,1)=O and P(2,2)=O) or (P(2,0)=O and P(1,1)=O and P(0,2)=O) or
+		(P(0,0)!=e and P(0,1)!=e and P(0,2)!=e and P(1,0)!=e and P(1,1)!=e and P(1,2)!=e and P(2,0)!=e
+		and P(2,1)!=e and P(2,2)!=e )): {finish};
+
+  end Protocol
+  Evolution:
+	state = gameover if Action = finish
+  end Evolution
+end Agent
+
+
+
+Agent Computer
+  Vars:
+   	P(0,0) : {e, X, O};
+	P(0,1) : {e, X, O};
+	P(0,2) : {e, X, O};
+	P(1,0) : {e, X, O};
+	P(1,1) : {e, X, O};
+	P(1,2) : {e, X, O};
+	P(2,0) : {e, X, O};
+	P(2,1) : {e, X, O};
+	P(2,2) : {e, X, O};
+      end Vars
+  Actions = {fill(0,0),fill(0,1),fill(0,2),fill(1,0),fill(1,1),fill(1,2),fill(2,0),fill(2,1),fill(2,2)};
+  Protocol:
+	Enviroment.state = gameover : {nothing}
+    	P(1,1)=e : {fill(1,1)};
+	((P(2,0)=X and P(1,1)=X) or (P(0,0)=X and P(0,1)=X) or
+	(P(2,2)=X and P(1,2)=X) or (P(2,0)=O and P(1,1)=O) or 
+	(P(0,0)=O and P(0,1)=O) or (P(2,2)=O and P(1,2)=O)) and P(0,2)=e :{fill(0,2)};
+
+	((P(0,1)=X and P(0,2)=X) or (P(1,1)=X and P(2,2)=X) or
+	(P(2,0)=X and P(1,0)=X) or (P(0,1)=O and P(0,2)=O) or (P(1,1)=O and P(2,2)=O) or
+	(P(2,0)=O and P(1,0)=O)) and P(0,0)=e :{fill(0,0)};
+
+	((P(0,2)=X and P(1,2)=X) or (P(2,0)=X and P(2,1)=X) or
+	(P(0,0)=X and P(1,1)=X) or (P(0,2)=O and P(1,2)=O) or (P(2,0)=O and P(2,1)=O) or
+	(P(0,0)=O and P(1,1)=O)) and P(2,2)=e :{fill(2,2)};
+
+
+	((P(0,2)=X and P(1,2)=X) or (P(2,0)=X and P(2,1)=X) or
+	(P(0,0)=X and P(1,1)=X) or (P(0,2)=O and P(1,2)=O) or (P(2,0)=O and P(2,1)=O) or
+	(P(0,0)=O and P(1,1)=O)) and P(2,0)=e :{fill(2,0)};
+
+	((P(0,0)=X and P(0,2)=X) or (P(1,1)=X and P(2,1)=X) or
+	 (P(0,0)=O and P(0,2)=O) or (P(1,1)=O and P(2,1)=O)) and and P(0,1)=e :{fill(0,1)};
+
+	((P(0,0)=X and P(2,0)=X) or (P(1,1)=X and P(1,2)=X) or
+	 (P(0,0)=O and P(2,0)=O) or (P(1,1)=O and P(1,2)=O)) and and P(1,0)=e :{fill(1,0)};
+
+	((P(2,0)=X and P(2,2)=X) or (P(1,1)=X and P(0,1)=X) or
+	 (P(2,0)=O and P(2,2)=O) or (P(1,1)=O and P(0,1)=O)) and P(2,1)=e :{fill(2,1)};
+
+	((P(2,2)=X and P(0,2)=X) or (P(1,1)=X and P(1,0)=X) or
+	 (P(2,2)=O and P(0,2)=O) or (P(1,1)=O and P(1,0)=O)) and P(1,2) =e :{fill(1,2)};
+
+	((P(0,0)=X and P(2,2)=X) or (P(2,0)=X and P(0,2)=X) or 
+	(P(1,0)=X and P(1,2)=X) or (P(0,1)=X and P(2,1)=X) or 
+	(P(0,0)=O and P(2,2)=O) or (P(2,0)=O and P(0,2)=O) or  
+	(P(1,0)=O and P(1,2)=O) or (P(0,1)=O and P(2,1)=O)) and P(1,1)=e : {fill(1,1)};
+
+	P(0,2)=O and P(2,0)=O and P(1,1)=X and P(0,1)=e : {fill(0,1)};
+
+	P(0,0)=O and P(2,2)=O and P(1,1)=X and P(0,1)=e : {fill(0,1)};
+
+	P(0,0)=O and P(1,1)=O and P(2,2)=X and P(0,2)=e : {fill(0,2)};
+
+	P(0,0)=X and P(1,1)=O and P(2,2)=O and P(0,2)=e : {fill(0,2)};
+
+	P(2,0)=O and P(1,1)=O and P(0,2)=X and P(2,2)=e : {fill(2,2)};
+
+	P(2,0)=X and P(1,1)=O and P(0,2)=O and P(2,2)=e : {fill(2,2)};
+
+	P(0,0)=e : {fill(0,0)};
+	P(0,1)=e : {fill(0,1)};
+	P(0,2)=e : {fill(0,2)};
+	P(1,0)=e : {fill(1,0)};
+	P(1,1)=e : {fill(1,1)};
+	P(1,2)=e : {fill(1,2)};
+	P(2,0)=e : {fill(2,0)};
+	P(2,1)=e : {fill(2,1)};
+	P(2,2)=e : {fill(2,2)};
+   end Protocol
+  Evolution:
+	P(0,0)=X if Action = fill(0,0);
+	P(0,1)=X if Action = fill(0,1);
+	P(0,2)=X if Action = fill(0,2);
+	P(1,0)=X if Action = fill(1,0);
+	P(1,1)=X if Action = fill(1,1);
+	P(1,2)=X if Action = fill(1,2);
+	P(2,0)=X if Action = fill(2,0);
+	P(2,1)=X if Action = fill(2,1);
+	P(2,2)=X if Action = fill(2,2);
+  end Evolution
+end Agent
+
+Agent Player
+  Vars:
+   	P(0,0) : {e, X, O};
+	P(0,1) : {e, X, O};
+	P(0,2) : {e, X, O};
+	P(1,0) : {e, X, O};
+	P(1,1) : {e, X, O};
+	P(1,2) : {e, X, O};
+	P(2,0) : {e, X, O};
+	P(2,1) : {e, X, O};
+	P(2,2) : {e, X, O};
+  end Vars
+  Actions = {fill(0,0),fill(0,1),fill(0,2),fill(1,0),fill(1,1),fill(1,2),fill(2,0),fill(2,1),fill(2,2)};
+  Protocol:
+	Enviroment.state = gameover : {nothing}
+
+  end Protocol
+  Evolution:
+	P(0,0)=O if Action = fill(0,0);
+	P(0,1)=O if Action = fill(0,1);
+	P(0,2)=O if Action = fill(0,2);
+	P(1,0)=O if Action = fill(1,0);
+	P(1,1)=O if Action = fill(1,1);
+	P(1,2)=O if Action = fill(1,2);
+	P(2,0)=O if Action = fill(2,0);
+	P(2,1)=O if Action = fill(2,1);
+	P(2,2)=O if Action = fill(2,2);
+  end Evolution
+end Agent
+
+Evaluation
+  computerwins if ( (P(0,0)=X and P(0,1)=X and P(0,2)=X) or (P(1,0)=X and P(1,1)=X and P(1,2)=X)
+		or (P(2,0)=X and P(2,1)=X and P(2,2)=X) or (P(0,0)=X and P(1,0)=X and P(2,0)=X)
+		or (P(0,1)=X and P(1,1)=X and P(2,1)=X) or (P(0,2)=X and P(1,2)=X and P(2,2)=X)
+		or (P(0,0)=X and P(1,1)=X and P(2,2)=X) or (P(2,0)=X and P(1,1)=X and P(0,2)=X)  );
+  playerwins if ( (P(0,0)=O and P(0,1)=O and P(0,2)=O) or (P(1,0)=O and P(1,1)=O and P(1,2)=O)
+		or (P(2,0)=O and P(2,1)=O and P(2,2)=O) or (P(0,0)=O and P(1,0)=O and P(2,0)=O)
+		or (P(0,1)=O and P(1,1)=O and P(2,1)=O) or (P(0,2)=O and P(1,2)=O and P(2,2)=O)
+		or (P(0,0)=O and P(1,1)=O and P(2,2)=O) or (P(2,0)=O and P(1,1)=O and P(0,2)=O)  );
+
+  draw       if (not computerwins and not playerwins and Enviroment.state = gameover );	
+end Evaluation
+
+InitStates
+  ( P(0,0)=e and P(0,1)=e and P(0,2)=e and P(1,0)=e and P(1,1)=e and P(1,2)=e and P(2,0)=e and P(2,1)=e
+	and P(2,2)=e and Enviroment.state = playing  );
+end InitStates
+
+
+Formulae
+  EF(computerwins);
+  AF(not playerwins);
+end Formulae
